@@ -1,0 +1,39 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-device": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-dialogs": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-geolocation": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-ios-location-permissions": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-statusbar": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-inappbrowser": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-file": {
+      "PACKAGE_NAME": "upv.es.project"
+    },
+    "cordova-plugin-advanced-http": {
+      "PACKAGE_NAME": "upv.es.project"
+    }
+  },
+  "dependent_plugins": {}
+}

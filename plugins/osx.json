@@ -1,0 +1,21 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-device": {},
+    "cordova-plugin-dialogs": {},
+    "cordova-plugin-geolocation": {},
+    "cordova-plugin-ios-location-permissions": {},
+    "cordova-plugin-whitelist": {},
+    "cordova-plugin-statusbar": {},
+    "cordova-plugin-inappbrowser": {},
+    "cordova-plugin-file": {},
+    "cordova-plugin-advanced-http": {}
+  },
+  "dependent_plugins": {}
+}

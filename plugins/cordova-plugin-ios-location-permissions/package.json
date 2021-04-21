@@ -1,0 +1,69 @@
+{
+  "_from": "cordova-plugin-ios-location-permissions",
+  "_id": "cordova-plugin-ios-location-permissions@1.0.0",
+  "_inBundle": false,
+  "_integrity": "sha512-EA9lZWJ8h0+cycN9b8KURczC0e9M2juRe3acLuWxqdvvegUujItUGkdpj12m2/FAZniXLA6vQ/ikgVc0bWYHmg==",
+  "_location": "/cordova-plugin-ios-location-permissions",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-ios-location-permissions",
+    "name": "cordova-plugin-ios-location-permissions",
+    "escapedName": "cordova-plugin-ios-location-permissions",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#DEV:/",
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-ios-location-permissions/-/cordova-plugin-ios-location-permissions-1.0.0.tgz",
+  "_shasum": "ca70d55108bc47c4ff7be0b9501ee308cffe9a9e",
+  "_spec": "cordova-plugin-ios-location-permissions",
+  "_where": "/Users/dlaumer/Mobile/CORDOVA/Project",
+  "author": {
+    "name": "Nicolás Naso",
+    "email": "niconaso@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/niconaso/cordova-plugin-ios-location-permissions/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-ios-location-permissions",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova / PhoneGap Plugin Permission Settings for NSLocationWhenInUseUsageDescription and NSLocationAlwaysAndWhenInUseUsageDescription in iOS 11 by adding a declaration to the Info.plist file",
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "homepage": "https://github.com/niconaso/cordova-plugin-ios-location-permissions#readme",
+  "keywords": [
+    "cordova",
+    "ios",
+    "ios10",
+    "ios11",
+    "app",
+    "security",
+    "permissions",
+    "NSLocationWhenInUseUsageDescription",
+    "NSLocationAlwaysAndWhenInUseUsageDescription",
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "license": "MIT",
+  "name": "cordova-plugin-ios-location-permissions",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niconaso/cordova-plugin-ios-location-permissions.git"
+  },
+  "version": "1.0.0"
+}
