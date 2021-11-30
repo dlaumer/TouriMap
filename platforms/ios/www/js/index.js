@@ -20,9 +20,9 @@
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
 
+/* *** DEFINITIONS *************************************************************  */
 
-// Symbol for POI
-
+// Symbols for POI
 symbols = {
     favourites: {
         type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
@@ -60,85 +60,81 @@ symbols = {
     }
 }
 
+// The names of the different layers
 var typesPoint = ["favourites", "natural","cultural", "historical", "religion", "architecture",  "industrial_facilities", "other"]
 
-var openWikipediaAction = {
-      title: "Open the corresponding wikipedia article",
-      id: "wiki",
-      image:
-        "https://cdn.icon-icons.com/icons2/17/PNG/256/wikipedia_wiki_2102.png"
-    };
-
+// Definition of the favourite button
 var markFavAction = {
-      title: "Mark/Remove as favourite",
-      id: "favourite",
-      image:
-        "https://www.flaticon.com/svg/static/icons/svg/1828/1828884.svg"
-    };
+  title: "Mark/Remove as favourite",
+  id: "favourite",
+  image:
+    "https://www.flaticon.com/svg/static/icons/svg/1828/1828884.svg"
+};
 
-var markFavAction2 = {
-      title: "Mark as favourite",
-      id: "favourite",
-      image:
-        "https://www.flaticon.com/svg/static/icons/svg/1828/1828970.svg"
-    };
-
-
-var template = {
-    // autocasts as new PopupTemplate()
-    title: "Point of interest:",
-    content: [
+// Template of the popup
+var popup = {
+  title: "Point of interest:",
+  content: [
+    {
+      type: "fields",
+      fieldInfos: [
       {
-        type: "fields",
-        fieldInfos: [
+          fieldName: "name",
+          label: "Name"
+        },
         {
-            fieldName: "name",
-            label: "Name"
-          },
-         {
-           fieldName: "kind",
-           label: "Category"
-         },
-          {
-            fieldName: "type",
-            label: "Other categories"
-          },
-          {
-            fieldName: "wikidata",
-            label: "Wikidata ID"
-          }
-        ]
-      }
-    ],
-    actions: [markFavAction]
-  };
+          fieldName: "kind",
+          label: "Category"
+        },
+        {
+          fieldName: "type",
+          label: "Other categories"
+        },
+        {
+          fieldName: "wikidata",
+          label: "Wikidata ID"
+        }
+      ]
+    }
+  ],
+  actions: [markFavAction]
+};
 
-var featureLayers = {};
-var visibleLayers = {}
+
+var featureLayers = {}; // Dict of all the feature layers
+var visibleLayers = {}  // Dict of all the visible layers
+
+// Set all layers to visible
 for (var i=0;i<typesPoint.length;i++) {
-    visibleLayers[typesPoint[i]] = true;
+  visibleLayers[typesPoint[i]] = true;
 }
 var legend;
-var jsonFavourites ={"favourites":[]};
+var jsonFavourites ={"favourites":[]};  // Json object which is saved locally and holds the favourites
 var fileObj;
 
+// Url for the api call, here with an example call
 var url = "https://api.opentripmap.com/0.1/ru/places/bbox?lon_min=-0.32856&lat_min=39.464587&lon_max=-0.30856&lat_max=39.484587&format=geojson&apikey=5ae2e3f221c38a28845f05b6aaceeb8303eb6b32050050abdc0a21ce";
 
+// The different components of the api url
 var opentripURL = "https://api.opentripmap.com/0.1/ru/places/bbox?";
 var opentripKEY = "5ae2e3f221c38a28845f05b6aaceeb8303eb6b32050050abdc0a21ce";
 
-var urlwiki = "https://cors-anywhere.herokuapp.com/https://cors-anywhere.herokuapp.com/https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=sitelinks/urls&ids="
+
+/* *** MAIN EXECUTION *************************************************************  */
 
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
 
+    // jQuery elements, only starts when all is ready
     $(document).ready(function() {
-        
         
         console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
 
+        /* *** ESRI REQUIRES *************************************************************  */
+
+        // Here we load the packages from esri
         require([
              "esri/widgets/Track",
              "esri/Map",
@@ -147,19 +143,22 @@ function onDeviceReady() {
              "esri/layers/FeatureLayer",
              "esri/core/watchUtils",
              "esri/geometry/support/webMercatorUtils",
-             "esri/renderers/UniqueValueRenderer",
              "esri/widgets/Legend",
              "esri/widgets/Expand",
              "esri/widgets/LayerList",
              "esri/widgets/Search",
             "esri/widgets/Locate",
              "dojo/domReady!"
-        ], function(Track, Map, MapView, Graphic, FeatureLayer, watchUtils, webMercatorUtils,UniqueValueRenderer,Legend, Expand, LayerList, Search, Locate) {
+        ], function(Track, Map, MapView, Graphic, FeatureLayer, watchUtils, webMercatorUtils,Legend, Expand, LayerList, Search, Locate) {
             
+          /* *** MAP ELEMENTS *************************************************************  */
+
+          // Make a new Map
             var map = new Map({
               basemap: "streets",
             });
             
+            // Add a mapview
             var view = new MapView({
               container: "viewDiv",
               map: map,
@@ -167,34 +166,6 @@ function onDeviceReady() {
               center: [-0.32856, 39.464587]
             });
             
-            apiCall(true);
-            
-            // Watch view's stationary property for becoming true.
-            watchUtils.whenTrue(view, "stationary", function() {
-              // Get the new center of the view only when view is stationary.
-              
-              // Get the new extent of the view only when view is stationary.
-              if (view.extent) {
-                  if (view.zoom > 8){
-
-                      for (var i=0;i<typesPoint.length;i++) {
-                          visibleLayers[typesPoint[i]] = featureLayers[typesPoint[i]].visible
-                      }
-                          
-                      var min = webMercatorUtils.xyToLngLat(view.extent.xmin,view.extent.ymin);
-                      var max = webMercatorUtils.xyToLngLat(view.extent.xmax,view.extent.ymax);
-                      console.log(min);
-                     
-                      url = opentripURL +  "lon_min="+min[0]+"&lat_min="+min[1]+"&lon_max="+max[0]+"&lat_max="+max[1]+"&format=geojson&apikey=" + opentripKEY;
-                      apiCall(false); // False stands for if it is the first call or not
-                  }
-                  else {
-                      for (var i=0;i<typesPoint.length;i++) {
-                          map.layers.remove(featureLayers[typesPoint[i]]);    // Remove the existing featureLayer
-                      }
-                  }
-              }
-            });
             
                        
             // Create an instance of the Track widget
@@ -210,28 +181,29 @@ function onDeviceReady() {
                   track.start();
                 });
             
-            view.ui.add("titleDiv", "top-right");
+            view.ui.add("titleDiv", "top-right"); // Add it to the map
 
             
-            
+            // Create the layer list inside of an expand object
             list = new Expand({
               content: new LayerList({
               view: view,
               listItemCreatedFunction: function(event) {
-                        const item = event.item;
-                        if (item.layer.type != "group") { // don't show legend twice
-                          item.panel = {
-                            content: "legend",
-                          };
-                        }
-                      }
+                const item = event.item;
+                if (item.layer.type != "group") { // don't show legend twice
+                  item.panel = {
+                    content: "legend",
+                  };
+                }
+              }
             }),
               view: view,
               expanded: false
             });
-            view.ui.add(list, "top-right");
+            view.ui.add(list, "top-right"); // Add it to the map
             
             
+            // Add a search widget
             var search = new Expand({
               content: new Search({
               view: view
@@ -239,37 +211,36 @@ function onDeviceReady() {
               view: view,
               expanded: false
             });
-            
-         
-            // Adds the search widget below other elements in
-            // the top left corner of the view
+            // Add it to the map
             view.ui.add(search, {
               position: "top-left",
               index: 0
             });
 
-                        var element = document.createElement('div');
+            // Create the button to delete the favourites
+            var element = document.createElement('div');
             element.className = "esri-icon-trash esri-widget--button esri-widget esri-interactive home";
             element.addEventListener('click', function (event) {
                 
                 if (confirm("Are you sure you want to delete all favourites?")) {
                   
-                    jsonFavourites["favourites"] = [];
-                    writeJSON();
+                    jsonFavourites["favourites"] = [];  // Delete the favourites
+                    writeJSON();  // Save the empty object to the file
+                    // Update the visible layers
                     for (var i=0;i<typesPoint.length;i++) {
                         visibleLayers[typesPoint[i]] = featureLayers[typesPoint[i]].visible
                     }
-                    apiCall(false);
+                    apiCall(); // Refresh the map
                     
                     alert("The favourites were deleted");
                 } else {
                   alert("Nothing was deleted");
                 }
                     });
-            view.ui.add(element, "top-right");
+            view.ui.add(element, "top-right");  // Add it to the map
             
             
-            
+            // Add the info box button
             var bgExpand = new Expand({
             expandIconClass: "esri-icon-question",
             expanded: false,
@@ -277,81 +248,80 @@ function onDeviceReady() {
             view: view,
               content: document.getElementById('alerts'),
             });
-            view.ui.add(bgExpand, "top-right");
+            view.ui.add(bgExpand, "top-right"); // Add it to the map
             
+
             
+            /* *** MAP FUNCTIONS *************************************************************  */
+
+            apiCall();  // Load the necesary information for the layers. 
             
-            /*
-            view.when(function(){
-              startGeolocation();
-            }, function(err){
-              console.error("There was a problem loading the map: ", err);
+
+            // Observer for the change of the extent
+            watchUtils.whenTrue(view, "stationary", function() {
+              // Get the new extent of the view only when view is stationary.
+              if (view.extent) {
+                  // Only load layers if it is close enough 
+                  if (view.zoom > 8){
+                     
+                    // Update the visible layers
+                      for (var i=0;i<typesPoint.length;i++) {
+                          visibleLayers[typesPoint[i]] = featureLayers[typesPoint[i]].visible
+                      }
+                          
+                      // Get the extent in lat/long
+                      var min = webMercatorUtils.xyToLngLat(view.extent.xmin,view.extent.ymin);
+                      var max = webMercatorUtils.xyToLngLat(view.extent.xmax,view.extent.ymax);
+
+                      // Create the new url with the new exent
+                      url = opentripURL +  "lon_min="+min[0]+"&lat_min="+min[1]+"&lon_max="+max[0]+"&lat_max="+max[1]+"&format=geojson&apikey=" + opentripKEY;
+                      // Update the layers
+                      apiCall(); 
+                  }
+                  else {
+                      // If it is zoomed out too much, don't show anything (otherwise map overload)
+                      for (var i=0;i<typesPoint.length;i++) {
+                          map.layers.remove(featureLayers[typesPoint[i]]);    // Remove the existing featureLayer
+                      }
+                  }
+              }
             });
-             */
             
-            // Event handler that fires each time an action is clicked.
+            
+            // Function that is fired after a button on the popup is clicked
             view.popup.on("trigger-action", function (event) {
               // Execute the measureThis() function if the measure-this action is clicked
               if (event.action.id === "favourite") {
                 markAsFavourite();
-              }
-            if (event.action.id === "wiki") {
-                openWikipedia();
-            }
-                
-                
+              }           
             });
             
-            
-            function openWikipedia() {
-                wikidataId = view.popup.selectedFeature.attributes.wikidata;
-                if (wikidataId == null) {
-                    alert("There is no wikipedia information for this feature")
-                }
-                else {
-                    var url = urlwiki + wikidataId;
-
-                    $.ajax({url: url, success: function(result){
-                        entities = data["entities"];
-                        sitelinks = entities[Object.keys(entities)[0]].sitelinks;
-                        var urlwiki;
-                        if ("eswiki" in Object.keys(sitelinks)) {
-                            urlwiki = sitelinks.eswiki.url;
-                        }
-                        else {
-                            urlwiki = sitelinks[Object.keys(sitelinks)[0]].url
-                        }
-                        
-                        var ref = cordova.InAppBrowser.open(urlwiki, '_blank', 'location=yes');
-
-                    }});
-                }
-            }
-            
-            
+            // Function that is fired after the favourite button is clicked
             function markAsFavourite() {
                 
-                //view.popup.title =  view.popup.title + " (Favourite)"
-                
-                selectedId = parseInt(view.popup.selectedFeature.attributes.ObjectId);
-                if (!(jsonFavourites["favourites"].includes(selectedId))) {
-                    jsonFavourites["favourites"].push(selectedId);
-                }
-                else {
-                    jsonFavourites["favourites"] = arrayRemove(jsonFavourites["favourites"],selectedId);
-                }
-                view.popup.close();
-                for (var i=0;i<typesPoint.length;i++) {
-                    visibleLayers[typesPoint[i]] = featureLayers[typesPoint[i]].visible
-                }
-                apiCall(false);
-                writeJSON();
+              // Find the selected feature
+              selectedId = parseInt(view.popup.selectedFeature.attributes.ObjectId);
 
-                //onsole.log(view.popup.actions.getItemAt(0))
-                //view.popup.actions.removeAt(2)
-                //view.popup.selectedFeature.attributes.name
+              // Either add or remove it from the favourites
+              if (!(jsonFavourites["favourites"].includes(selectedId))) {
+                  jsonFavourites["favourites"].push(selectedId);
+              }
+              else {
+                  jsonFavourites["favourites"] = arrayRemove(jsonFavourites["favourites"],selectedId);
+              }
+              view.popup.close();
+
+              // Refresh the map view
+              for (var i=0;i<typesPoint.length;i++) {
+                  visibleLayers[typesPoint[i]] = featureLayers[typesPoint[i]].visible
+              }
+              apiCall();
+              // Save the info locally
+              writeJSON();
+
             }
             
+            // Helper function to remove element in list
             function arrayRemove(arr, value) {
                 
                     return arr.filter(function(ele){
@@ -359,9 +329,9 @@ function onDeviceReady() {
                     });
                 }
             
+            // Function to read the local favourites file
             function readJson() {
-                var fileName = "favourites.json";
-                    
+                var fileName = "favourites.json"; // Hard coded filename
                     
                 var storageLocation = "";
                 switch (device.platform) {
@@ -382,6 +352,7 @@ function onDeviceReady() {
                 
             }
             
+            // Helper to read the file
             function gotFile(file) {
                 var reader = new FileReader();
                 reader.onloadend = function(evt) {
@@ -392,10 +363,13 @@ function onDeviceReady() {
                 reader.readAsText(file);
             }
             
+            // Helper to read the file
             function fail(evt) {
                     console.log(evt.target.error.code);
                 }
             
+
+            // Function to save the favourites json locally
             function writeJSON() {
                 
                 var fileName = "favourites.json";
@@ -419,7 +393,7 @@ function onDeviceReady() {
                 });
             }
 
-            
+            // Helper to write the file
             function writeFile(jsonString){
                 if(!fileObj) {
                     return;
@@ -432,6 +406,7 @@ function onDeviceReady() {
 
             }
 
+            // Helper to write the file
             function writeFileError(e) {
                 navigator.notification.alert(
                     "FileSystem Error\n" + JSON.stringify(e, null, 2), function(){},
@@ -441,64 +416,29 @@ function onDeviceReady() {
                 return;
             }
             
-            function startGeolocation(){
-              console.log("Starting geolocation...");
-              let location = navigator.geolocation.getCurrentPosition(
-                  locationSuccess,
-                  locationError,
-                  {
-                    maxAge: 250000,
-                    timeout: 15000,
-                    enableHighAccuracy:true
-                  }
-              );
-            }
             
-            // Handle location success
-            function locationSuccess(position){
-              if(position.coords.latitude != null || position.coords.longitude != null){
-                console.log("long: " + position.coords.longitude + ", lat: " + position.coords.latitude);
-                view.center = [position.coords.longitude,position.coords.latitude];
-              }
-            }
-            
-            function locationError(error){
-              console.log("locationError code: " + error.code);
+            /* *** OPENTRIPMAP API CALL *************************************************************  */
 
-              switch(error.code) {
-                case error.PERMISSION_DENIED:
-                  alert("User denied request for geolocation.");
-                  break;
-                case error.POSITION_UNAVAILABLE:
-                  alert("Location information is unavailable. Check application settings, make sure location permissions have been granted");
-                  break;
-                case error.TIMEOUT:
-                  alert( "The request to get user location timed out.");
-                  break;
-                case error.UNKNOWN_ERROR:
-                  alert("An unknown error occurred.");
-                  break;
-              }
-            }
-            
-            
-            function apiCall(firstTime) {
-                // Read the favourites
+            function apiCall() {
+                // Read the favourites, so we know which features to mark with a star
                 readJson();
-                console.log(jsonFavourites);
-                // Get the new data from the OpenTrip API
+                
+                // Get the new data from the OpenTrip API with a asynchronous ajax call
                 $.ajax({url: url, success: function(result){
                     
-                                        
                     graphics ={};
+                    // Prepare a list for each layer
                     for (var i=0;i<typesPoint.length;i++) {
                         graphics[typesPoint[i]] = [];
                     }
+                    // Go through all features and distribute them into the different layers
                     for (var i=0;i < result.features.length;i++) {
                         var feature = result.features[i]
                         var kinds = feature.properties.kinds.split(",");
+                        // Only take the ones tagged as interesting
                         if (kinds.includes("interesting_places")){
                             
+                          // Create new graphic
                             var grapic = new Graphic({
                               attributes: {
                                 ObjectId: feature.id,
@@ -513,7 +453,7 @@ function onDeviceReady() {
                               }
                             });
                             
-                            
+                            // Check if this one is a favourite
                             if (jsonFavourites.favourites.includes(parseInt(feature.id))) {
                                 grapic.attributes.favourite = true;
                             }
@@ -521,7 +461,7 @@ function onDeviceReady() {
                                 grapic.attributes.favourite = false;
                             }
                             
-                            var kind;
+                            // Check the layer
                             if (jsonFavourites.favourites.includes(parseInt(feature.id))) {
                                 grapic.attributes.kind = "favourites"
                                 graphics["favourites"].push(grapic);
@@ -558,6 +498,7 @@ function onDeviceReady() {
                         }
                     };
 
+                    // Loop over all layers and create the feature layer
                     for (var i=typesPoint.length-1;i>=0;i--) {
                         map.layers.remove(featureLayers[typesPoint[i]]);    // Remove the existing featureLayer
                         featureLayers[typesPoint[i]] = new FeatureLayer({
@@ -568,7 +509,7 @@ function onDeviceReady() {
                           renderer: {
                               type: "simple", // autocasts as new SimpleRenderer()
                               symbol: symbols[typesPoint[i]]},
-                          popupTemplate: template,
+                          popupTemplate: popup,
                           objectIdField: "ObjectID",           // This must be defined when creating a layer from `Graphic` objects
                           fields: [
                             {

@@ -35,15 +35,21 @@
             <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
             
         <title>Tourist App</title>
-        <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css">
-        <link rel="stylesheet" href="./css/index.css">
-        <script src="https://js.arcgis.com/4.8/"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://js.arcgis.com/4.8/esri/css/main.css"> <!-- API for the map and map elements -->
+        <link rel="stylesheet" href="./css/index.css"> 
+        <script src="https://js.arcgis.com/4.8/"></script> <!-- API for the map and map elements -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> <!-- jQuery to make the asynchronous API call -->
     </head>
     <body>
 
-        <div id="viewDiv"></div>
-        <div id="alerts" class="esri-widget alerts">
+        <div id="viewDiv"></div> <!-- div for the map -->
+
+        <div id="titleDiv" class="esri-widget"> <!-- div for the title -->
+            <div id="titleText">TouriMap</div>
+            <div>Discover your destination</div>
+        </div>
+
+        <div id="infoDiv" class="esri-widget alerts"> <!-- div for the info -->
           <div class="item"><span class="esri-icon-description"></span> This project was developed under the scope of the course "geospatial applications for mobile devices" at UPV, Valencia, España.<br></div>
           <div class="item"><span class="esri-icon-maps"></span> The data for the tourist sites is taken from opentripmap.com<br></div>
           
@@ -54,10 +60,7 @@
           
         </div>
         
-        <div id="titleDiv" class="esri-widget">
-              <div id="titleText">TouriMap</div>
-              <div>Discover your destination</div>
-        </div>
+        <!-- All the other map elements are created from the js file -->
        
         <script src="js/index.js"></script>
         <script src="cordova.js"></script>
